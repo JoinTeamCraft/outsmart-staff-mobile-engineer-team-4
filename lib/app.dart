@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'core/di/service_locator.dart';
 import 'core/theme/app_theme.dart';
+import 'features/streaks/presentation/streak_notifier.dart';
 
 class StreakLearnApp extends StatelessWidget {
   const StreakLearnApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'StreakLearn',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const HomeScreenPlaceholder(),
-      },
+    // .value: the notifier is an app-lifetime singleton owned by the locator,
+    // so the provider must not dispose it.
+    return ChangeNotifierProvider<StreakNotifier>.value(
+      value: locator<StreakNotifier>(),
+      child: MaterialApp(
+        title: 'StreakLearn',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.system,
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const HomeScreenPlaceholder(),
+        },
+      ),
     );
   }
 }

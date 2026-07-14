@@ -42,3 +42,8 @@ final class DataParsingFailure extends AppFailure {
 final class UnexpectedFailure extends AppFailure {
   const UnexpectedFailure([super.message = 'Something went wrong.']);
 }
+
+/// Local key-value storage could not be read or written.
+final class StorageFailure extends AppFailure {
+  const StorageFailure([super.message = 'Could not access local storage.']);
+}
