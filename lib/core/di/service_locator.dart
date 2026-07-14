@@ -8,6 +8,8 @@ final GetIt locator = GetIt.instance;
 
 const double _simulatedNetworkFailureRate = 0.15;
 
+/// Registers the data layer. The nonzero failure rate keeps error handling
+/// visible while running the app.
 void setupLocator() {
   locator.registerLazySingleton<ApiClient>(
     () => ApiClient(failureRate: _simulatedNetworkFailureRate),

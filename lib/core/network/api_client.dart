@@ -4,6 +4,9 @@ import 'package:flutter/services.dart';
 
 import 'network_exception.dart';
 
+/// Serves the bundled mock JSON as if it were a remote API: every request
+/// waits [latency] and fails with [NetworkException] at [failureRate]
+/// probability.
 class ApiClient {
   ApiClient({
     AssetBundle? bundle,
@@ -25,8 +28,10 @@ class ApiClient {
   final double failureRate;
   final Duration latency;
 
+  /// Fetches the raw lessons JSON.
   Future<String> getLessonsRaw() => _fetch(lessonsAsset);
 
+  /// Fetches the raw quizzes JSON.
   Future<String> getQuizzesRaw() => _fetch(quizzesAsset);
 
   Future<String> _fetch(String asset) async {

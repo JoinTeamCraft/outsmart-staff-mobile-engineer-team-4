@@ -1,3 +1,4 @@
+/// A lesson as served by the mock API.
 final class Lesson {
   const Lesson({
     required this.id,
@@ -7,6 +8,8 @@ final class Lesson {
     required this.content,
   });
 
+  /// Parses [json], throwing a [FormatException] when a required field is
+  /// missing or has the wrong type.
   factory Lesson.fromJson(Map<String, dynamic> json) => switch (json) {
         {
           'id': final String id,

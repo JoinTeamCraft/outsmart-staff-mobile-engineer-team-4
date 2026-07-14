@@ -1,3 +1,4 @@
+/// Thrown when a simulated network request fails.
 final class NetworkException implements Exception {
   const NetworkException(this.message);
 

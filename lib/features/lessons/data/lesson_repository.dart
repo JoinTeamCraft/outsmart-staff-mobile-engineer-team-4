@@ -5,12 +5,15 @@ import '../../../core/network/network_exception.dart';
 import '../../../core/result/result.dart';
 import '../domain/lesson.dart';
 
+/// Loads lessons from the mock API and maps every outcome to a [Result].
 class LessonRepository {
   const LessonRepository({required ApiClient apiClient})
       : _apiClient = apiClient;
 
   final ApiClient _apiClient;
 
+  /// Fetches all lessons. Never throws: network, parsing, and unexpected
+  /// errors come back as a [Failure].
   Future<Result<List<Lesson>>> getLessons() async {
     try {
       final raw = await _apiClient.getLessonsRaw();

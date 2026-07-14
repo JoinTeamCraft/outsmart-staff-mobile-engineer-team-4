@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
 
+/// The quiz belonging to one lesson.
 final class Quiz {
   const Quiz({required this.lessonId, required this.questions});
 
+  /// Parses [json], throwing a [FormatException] when the quiz or any nested
+  /// question is malformed.
   factory Quiz.fromJson(Map<String, dynamic> json) => switch (json) {
         {
           'lessonId': final String lessonId,
@@ -39,6 +42,8 @@ final class Quiz {
   String toString() => 'Quiz($lessonId, ${questions.length} questions)';
 }
 
+/// One multiple-choice question. [correctIndex] is guaranteed to point inside
+/// [options].
 final class Question {
   const Question({
     required this.id,
@@ -47,6 +52,8 @@ final class Question {
     required this.correctIndex,
   });
 
+  /// Parses [json] and validates the invariants: options must be non-empty
+  /// strings and [correctIndex] must be in range.
   factory Question.fromJson(Map<String, dynamic> json) {
     final (id, question, rawOptions, correctIndex) = switch (json) {
       {
