@@ -59,8 +59,8 @@ class QuizSessionNotifier extends ChangeNotifier {
 
     try {
       await _recordCompletion(quiz.lessonId);
-    } catch (_) {
-      // best-effort, per the doc comment above
+    } catch (error) {
+      if (kDebugMode) debugPrint('QuizSessionNotifier: $error');
     }
     notifyListeners();
   }
