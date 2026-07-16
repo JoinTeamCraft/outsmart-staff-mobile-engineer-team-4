@@ -143,6 +143,34 @@ void main() {
 
       expect(session.lastResult?.score, 2);
       expect(notifications, 1);
+      expect(session.lastStreakRecordError, isA<StateError>());
+    });
+
+    test('clears a previous streak record error once a submission succeeds',
+        () async {
+      var shouldFail = true;
+      final session = QuizSessionNotifier(
+        recordCompletion: (lessonId) async {
+          if (shouldFail) throw StateError('save failed');
+        },
+      );
+
+      await session.submitQuiz(quiz: quiz, selectedAnswers: [0, 2]);
+      expect(session.lastStreakRecordError, isNotNull);
+
+      shouldFail = false;
+      await session.submitQuiz(quiz: quiz, selectedAnswers: [0, 2]);
+      expect(session.lastStreakRecordError, isNull);
+    });
+
+    test('throws ArgumentError for an out-of-range answer index', () {
+      final session = buildSession();
+
+      expect(
+        () => session.submitQuiz(quiz: quiz, selectedAnswers: [0, 5]),
+        throwsArgumentError,
+      );
+      expect(session.lastResult, isNull);
     });
 
     test('throws ArgumentError for a quiz with no questions', () {

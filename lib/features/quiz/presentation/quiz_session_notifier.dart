@@ -16,14 +16,17 @@ class QuizSessionNotifier extends ChangeNotifier {
   final DateTime Function() _now;
 
   QuizResult? _lastResult;
+  Object? _lastStreakRecordError;
 
   /// The most recent completion, or null before the first submission.
   QuizResult? get lastResult => _lastResult;
 
-  /// Scores [selectedAnswers] against [quiz]; unanswered questions (`null`)
-  /// count as wrong. Throws [ArgumentError] for an empty quiz or a mismatched
-  /// answer count. Streak recording is best-effort: a failure there doesn't
-  /// stop the result from reaching subscribers.
+  /// The most recent streak-recording error, or null if it succeeded.
+  /// Best-effort: doesn't block [lastResult] from notifying subscribers.
+  Object? get lastStreakRecordError => _lastStreakRecordError;
+
+  /// Scores [selectedAnswers] against [quiz]; `null` counts as wrong.
+  /// Throws [ArgumentError] for malformed input.
   Future<void> submitQuiz({
     required Quiz quiz,
     required List<int?> selectedAnswers,
@@ -45,7 +48,15 @@ class QuizSessionNotifier extends ChangeNotifier {
 
     var score = 0;
     for (final (index, question) in quiz.questions.indexed) {
-      if (selectedAnswers[index] == question.correctIndex) {
+      final answer = selectedAnswers[index];
+      if (answer != null && (answer < 0 || answer >= question.options.length)) {
+        throw ArgumentError.value(
+          answer,
+          'selectedAnswers[$index]',
+          'must be a valid option index for question ${question.id}',
+        );
+      }
+      if (answer == question.correctIndex) {
         score++;
       }
     }
@@ -59,7 +70,9 @@ class QuizSessionNotifier extends ChangeNotifier {
 
     try {
       await _recordCompletion(quiz.lessonId);
+      _lastStreakRecordError = null;
     } catch (error) {
+      _lastStreakRecordError = error;
       if (kDebugMode) debugPrint('QuizSessionNotifier: $error');
     }
     notifyListeners();
