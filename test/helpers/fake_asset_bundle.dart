@@ -7,9 +7,11 @@ class FakeAssetBundle extends AssetBundle {
   FakeAssetBundle(this._assets);
 
   final Map<String, String> _assets;
+  final Map<String, int> loadCounts = {};
 
   @override
   Future<ByteData> load(String key) async {
+    loadCounts[key] = (loadCounts[key] ?? 0) + 1;
     final asset = _assets[key];
     if (asset == null) {
       throw FlutterError('Unable to load asset: $key');

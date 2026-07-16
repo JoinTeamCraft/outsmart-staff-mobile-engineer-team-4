@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'core/di/service_locator.dart';
 import 'core/result/result.dart';
 import 'core/routing/app_routes.dart';
@@ -8,34 +7,47 @@ import 'features/lessons/data/lesson_repository.dart';
 import 'features/lessons/domain/lesson.dart';
 import 'features/lessons/presentation/lesson_detail_screen.dart';
 import 'features/quiz/presentation/quiz_screen_placeholder.dart';
+import 'package:provider/provider.dart';
+import 'features/streaks/presentation/streak_notifier.dart';
+
 
 class StreakLearnApp extends StatelessWidget {
   const StreakLearnApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'StreakLearn',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      initialRoute: AppRoutes.home,
-      routes: {
-        AppRoutes.home: (context) => const HomeScreenPlaceholder(),
-      },
-      onGenerateRoute: (settings) => switch (settings.name) {
-        AppRoutes.lessonDetail => MaterialPageRoute<void>(
-            settings: settings,
-            builder: (_) =>
-                LessonDetailScreen(lesson: settings.arguments! as Lesson),
-          ),
-        AppRoutes.quiz => MaterialPageRoute<void>(
-            settings: settings,
-            builder: (_) =>
-                QuizScreenPlaceholder(lessonId: settings.arguments! as String),
-          ),
-        _ => null,
-      },
+    // .value: the notifier is an app-lifetime singleton owned by the locator,
+    // so the provider must not dispose it.
+    return ChangeNotifierProvider<StreakNotifier>.value(
+      value: locator<StreakNotifier>(),
+      child: MaterialApp(
+        title: 'StreakLearn',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.system,
+        initialRoute: AppRoutes.home,
+        routes: {
+          AppRoutes.home: (context) => const HomeScreenPlaceholder(),
+        },
+        onGenerateRoute: (settings) =>
+        switch (settings.name) {
+          AppRoutes.lessonDetail =>
+              MaterialPageRoute<void>(
+                settings: settings,
+                builder: (_) =>
+                    LessonDetailScreen(lesson: settings.arguments! as Lesson),
+              ),
+          AppRoutes.quiz =>
+              MaterialPageRoute<void>(
+                settings: settings,
+                builder: (_) =>
+                    QuizScreenPlaceholder(
+                        lessonId: settings.arguments! as String),
+              ),
+          _ => null,
+        },
+      ),
+
     );
   }
 }
@@ -95,17 +107,20 @@ class _HomeScreenPlaceholderState extends State<HomeScreenPlaceholder> {
               OutlinedButton(
                 onPressed: _loading ? null : _loadLessons,
                 child: Text(
-                  _loading ? 'Loading lessons...' : 'Preview lesson detail (dev)',
+                  _loading
+                      ? 'Loading lessons...'
+                      : 'Preview lesson detail (dev)',
                 ),
               )
             else
               for (final lesson in _lessons)
                 TextButton(
-                  onPressed: () => Navigator.pushNamed(
-                    context,
-                    AppRoutes.lessonDetail,
-                    arguments: lesson,
-                  ),
+                  onPressed: () =>
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.lessonDetail,
+                        arguments: lesson,
+                      ),
                   child: Text(lesson.title),
                 ),
           ],
