@@ -22,11 +22,12 @@ class QuizSessionNotifier extends ChangeNotifier {
 
   /// Scores [selectedAnswers] against [quiz]; unanswered questions (`null`)
   /// count as wrong. Throws [ArgumentError] for an empty quiz or a mismatched
-  /// answer count.
+  /// answer count. Streak recording is best-effort: a failure there doesn't
+  /// stop the result from reaching subscribers.
   Future<void> submitQuiz({
     required Quiz quiz,
     required List<int?> selectedAnswers,
-  }) {
+  }) async {
     if (quiz.questions.isEmpty) {
       throw ArgumentError.value(
         quiz,
@@ -55,6 +56,12 @@ class QuizSessionNotifier extends ChangeNotifier {
       totalQuestions: quiz.questions.length,
       completedAt: _now(),
     );
-    return _recordCompletion(quiz.lessonId).then((_) => notifyListeners());
+
+    try {
+      await _recordCompletion(quiz.lessonId);
+    } catch (_) {
+      // best-effort, per the doc comment above
+    }
+    notifyListeners();
   }
 }

@@ -131,6 +131,20 @@ void main() {
       expect(order, ['record-start', 'record-end', 'notified']);
     });
 
+    test('still emits the result when recordCompletion throws', () async {
+      final session = QuizSessionNotifier(
+        recordCompletion: (lessonId) async => throw StateError('save failed'),
+      );
+
+      var notifications = 0;
+      session.addListener(() => notifications++);
+
+      await session.submitQuiz(quiz: quiz, selectedAnswers: [0, 2]);
+
+      expect(session.lastResult?.score, 2);
+      expect(notifications, 1);
+    });
+
     test('throws ArgumentError for a quiz with no questions', () {
       final session = buildSession();
       const empty = Quiz(lessonId: 'lesson-1', questions: []);
