@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../features/lessons/data/lesson_repository.dart';
 import '../../features/quiz/data/quiz_repository.dart';
+import '../../features/quiz/presentation/quiz_session_notifier.dart';
 import '../../features/streaks/data/streak_repository.dart';
 import '../../features/streaks/presentation/streak_notifier.dart';
 import '../cache/cached_resource.dart';
@@ -38,5 +39,10 @@ void setupLocator({required SharedPreferences preferences}) {
   );
   locator.registerLazySingleton<StreakNotifier>(
     () => StreakNotifier(repository: locator<StreakRepository>()),
+  );
+  locator.registerLazySingleton<QuizSessionNotifier>(
+    () => QuizSessionNotifier(
+      recordCompletion: locator<StreakNotifier>().completeLesson,
+    ),
   );
 }
