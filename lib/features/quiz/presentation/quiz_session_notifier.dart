@@ -55,8 +55,6 @@ class QuizSessionNotifier extends ChangeNotifier {
       totalQuestions: quiz.questions.length,
       completedAt: _now(),
     );
-    final completionRecorded = _recordCompletion(quiz.lessonId);
-    notifyListeners();
-    return completionRecorded;
+    return _recordCompletion(quiz.lessonId).then((_) => notifyListeners());
   }
 }

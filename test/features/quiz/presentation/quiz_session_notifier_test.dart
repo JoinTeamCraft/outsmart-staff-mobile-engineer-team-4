@@ -115,6 +115,22 @@ void main() {
       expect(completions, ['lesson-1']);
     });
 
+    test('notifies only after recordCompletion resolves', () async {
+      final order = <String>[];
+      final session = QuizSessionNotifier(
+        recordCompletion: (lessonId) async {
+          order.add('record-start');
+          await Future<void>.delayed(Duration.zero);
+          order.add('record-end');
+        },
+      );
+      session.addListener(() => order.add('notified'));
+
+      await session.submitQuiz(quiz: quiz, selectedAnswers: [0, 2]);
+
+      expect(order, ['record-start', 'record-end', 'notified']);
+    });
+
     test('throws ArgumentError for a quiz with no questions', () {
       final session = buildSession();
       const empty = Quiz(lessonId: 'lesson-1', questions: []);
