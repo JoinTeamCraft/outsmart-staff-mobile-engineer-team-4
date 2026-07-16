@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'core/di/service_locator.dart';
 import 'core/theme/app_theme.dart';
+import 'features/quiz/presentation/quiz_session_notifier.dart';
 import 'features/streaks/presentation/streak_notifier.dart';
 
 class StreakLearnApp extends StatelessWidget {
@@ -10,10 +11,17 @@ class StreakLearnApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // .value: the notifier is an app-lifetime singleton owned by the locator,
-    // so the provider must not dispose it.
-    return ChangeNotifierProvider<StreakNotifier>.value(
-      value: locator<StreakNotifier>(),
+    // .value: the notifiers are app-lifetime singletons owned by the locator,
+    // so the providers must not dispose them.
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<StreakNotifier>.value(
+          value: locator<StreakNotifier>(),
+        ),
+        ChangeNotifierProvider<QuizSessionNotifier>.value(
+          value: locator<QuizSessionNotifier>(),
+        ),
+      ],
       child: MaterialApp(
         title: 'StreakLearn',
         theme: AppTheme.lightTheme,
